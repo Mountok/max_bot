@@ -6,6 +6,7 @@ import (
 	"github.com/max-messenger/max-bot-api-client-go/schemes"
 )
 
+
 // Если ничего не подошло
 func HandleDefault(ctx context.Context, api *maxbot.Api, upd *schemes.MessageCreatedUpdate) {
 	msg := maxbot.NewMessage().

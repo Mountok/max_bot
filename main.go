@@ -4,6 +4,7 @@ import (
 	"context"
 	"first-max-bot/config"
 	"first-max-bot/handlers"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -13,8 +14,17 @@ import (
 )
 
 func main() {
+
+	schedule, err := handlers.InitSchedule()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(schedule.Groups[0].Name)
+
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, os.Interrupt)
 	defer stop()
+
+
 
 	api, _ := maxbot.New(config.BotToken)
 
@@ -24,12 +34,6 @@ func main() {
 			if !handlers.HandleGreeting(ctx, api, u) {
 				handlers.HandleDefault(ctx, api, u)
 			}
-		case *schemes.MessageCallbackUpdate:
-			// Обработка колбэков будет здесь
-			if u.Callback.Payload == "num" {
-				handlers.NUMChoice(ctx, api, u)
-			}
-			
 		}
 	}
 }
