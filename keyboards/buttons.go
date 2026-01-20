@@ -8,7 +8,7 @@ import (
 func MainKeyboard(api *maxbot.Api) *maxbot.Keyboard {
 	kb := api.Messages.NewKeyboardBuilder()
 	kb.AddRow().
-		AddLink("Открыть расписание", schemes.POSITIVE, "https://max.ru/ggkit_timetable_bot?startapp").
-		AddCallback("🪨📄✂️", schemes.NEGATIVE, "num")
+		AddLink("Открыть приложение", schemes.POSITIVE, "https://max.ru/ggkit_timetable_bot?startapp").
+		AddCallback("Посмотреть расписание", schemes.POSITIVE, "getshedule")
 	return kb
 }

@@ -1,11 +1,19 @@
 package handlers
 
-
 import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sync"
+	"time"
 )
+
+// Глобальная мапа для отслеживания пользователей, ожидающих ввод группы
+var waitingForGroup = make(map[int64]bool)
+var waitingMutex sync.RWMutex
+
+// Глобальная переменная для расписания
+var globalSchedule *Schedule
 
 // Структура для занятия
 type Lesson struct {
@@ -34,7 +42,7 @@ type Schedule struct {
 }
 
 func InitSchedule() (*Schedule, error) {
-	
+
 	data, err := os.ReadFile("schedule.json")
 	if err != nil {
 		panic(err)
@@ -48,6 +56,33 @@ func InitSchedule() (*Schedule, error) {
 	}
 
 	fmt.Println("ParseData")
-	
+
+
+	globalSchedule = &schedule
 	return &schedule, nil
+}
+
+func GetScheduleForGroup(schedule *Schedule, groupName string) *Group {
+	for _, group := range schedule.Groups {
+		if group.Name == groupName {
+			return &group
+		}
+	}
+	return nil
+}
+
+func GetScheduleForDay(group *Group, dayName string) *Day {
+	for _, days := range group.Days {
+		if days.Name == dayName {
+			return &days
+		}
+	}
+	return nil
+}
+
+// Функция для получения текущего дня недели
+func GetCurrentDayName() string {
+	days := []string{"Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"}
+	weekday := time.Now().Weekday()
+	return days[weekday]
 }
