@@ -10,6 +10,9 @@ import (
 
 // Глобальная мапа для отслеживания пользователей, ожидающих ввод группы
 var waitingForGroup = make(map[int64]bool)
+
+// Глобальная мапа для отслеживания пользователей, ожидающих ввод технической проблемы
+var waitingForTechSupport = make(map[int64]bool)
 var waitingMutex sync.RWMutex
 
 // Глобальная переменная для расписания
@@ -56,7 +59,6 @@ func InitSchedule() (*Schedule, error) {
 	}
 
 	fmt.Println("ParseData")
-
 
 	globalSchedule = &schedule
 	return &schedule, nil

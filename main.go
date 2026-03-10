@@ -61,11 +61,10 @@ func main() {
 			// 	}
 			// 	for _, chat := range chatlist.Chats {
 			// 		fmt.Sprintf("id: %#v\n", chat.ChatId)
-			// 		api.Messages.Send(ctx, maxbot.NewMessage().SetChat(chat.ChatId).SetText("ЙООООООООВ"))		
+			// 		api.Messages.Send(ctx, maxbot.NewMessage().SetChat(chat.ChatId).SetText("ЙООООООООВ"))
 			// 	}
 			// 	continue
 			// }
-
 			// keyboard := api.Messages.NewKeyboardBuilder()
 			// keyboard.
 			// 	AddRow().
@@ -79,8 +78,6 @@ func main() {
 			// keyboard.
 			// 	AddRow().
 			// 	AddCallback("Картинка", schemes.POSITIVE, "picture")
-			
-			
 			// api.Messages.Send(ctx, maxbot.NewMessage().SetChat(u.Message.Recipient.ChatId).AddKeyboard(keyboard).SetText("выбери"))
 			// api.Messages.Send(ctx, maxbot.NewMessage().Reply("**Reply** universal", u.Message).SetFormat("markdown"))
 
@@ -90,8 +87,11 @@ func main() {
 		case *schemes.MessageCallbackUpdate:
 			if u.Callback.Payload == "getshedule" {
 				handlers.HandleSchedule(ctx, api, u)
-			}
-		
+			} else if u.Callback.Payload == "tech_support" {
+				handlers.HandleTechSupport(ctx, api, u)
+			} 
+
+
 		default:
 			log.Printf("Unknown type: %#v", upd)
 		}

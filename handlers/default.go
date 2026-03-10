@@ -4,12 +4,45 @@ import (
 	"context"
 	"fmt"
 
+	"first-max-bot/config"
+
 	maxbot "github.com/max-messenger/max-bot-api-client-go"
 	"github.com/max-messenger/max-bot-api-client-go/schemes"
 )
 
 // Если ничего не подошло
 func HandleDefault(ctx context.Context, api *maxbot.Api, upd *schemes.MessageCreatedUpdate) {
+	// Проверяем, ожидает ли пользователь ввод технической проблемы
+	waitingMutex.RLock()
+	isWaitingTech := waitingForTechSupport[upd.Message.Recipient.ChatId]
+	waitingMutex.RUnlock()
+
+	if isWaitingTech {
+		// Отправляем сообщение всем администраторам
+		techMessage := fmt.Sprintf("🆘 Техническая проблема от пользователя %d:\n\n%s",
+			upd.Message.Recipient.ChatId, upd.Message.Body.Text)
+
+		for _, adminID := range config.AdminUserIDs {
+			adminMsg := maxbot.NewMessage().
+				SetChat(adminID).
+				SetText(techMessage)
+			api.Messages.Send(ctx, adminMsg)
+		}
+
+		// Отправляем подтверждение пользователю
+		confirmMsg := maxbot.NewMessage().
+			SetChat(upd.Message.Recipient.ChatId).
+			SetText("Спасибо! Ваше сообщение отправлено администраторам. Мы свяжемся с вами в ближайшее время.")
+		api.Messages.Send(ctx, confirmMsg)
+
+		// Сбрасываем состояние ожидания
+		waitingMutex.Lock()
+		delete(waitingForTechSupport, upd.Message.Recipient.ChatId)
+		waitingMutex.Unlock()
+
+		return
+	}
+
 	// Проверяем, ожидает ли пользователь ввод группы
 	waitingMutex.RLock()
 	isWaiting := waitingForGroup[upd.Message.Recipient.ChatId]
@@ -63,11 +96,11 @@ func HandleDefault(ctx context.Context, api *maxbot.Api, upd *schemes.MessageCre
 		return
 	}
 
-	msg := maxbot.NewMessage().
-		SetChat(upd.Message.Recipient.ChatId).
-		SetText("Извините, я пока учусь 😊")
+	// msg := maxbot.NewMessage().
+	// 	SetChat(upd.Message.Recipient.ChatId).
+	// 	SetText("Извините, я пока учусь 😊")
 
-	api.Messages.Send(ctx, msg)
+	// api.Messages.Send(ctx, msg)
 }
 
 func HandleSchedule(ctx context.Context, api *maxbot.Api, upd *schemes.MessageCallbackUpdate) {

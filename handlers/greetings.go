@@ -9,16 +9,16 @@ import (
 	"github.com/max-messenger/max-bot-api-client-go/schemes"
 )
 
-// Обрабатываем приветствия
+// Обрабатываем пиветствия
 func HandleGreeting(ctx context.Context, api *maxbot.Api, upd *schemes.MessageCreatedUpdate) bool {
 	if upd.Message.Body.Text == " " || upd.Message.Body.Text == "" {
 		return false
 	}
 	text := strings.Trim(strings.ToLower(upd.Message.Body.Text), "\n\r\t ")
-	if text == "привет" || text == "здравствуйте" {
+	if text == "привет" || text ==  "здравствуйте" {
 		msg := maxbot.NewMessage().
 			SetChat(upd.Message.Recipient.ChatId).
-			AddKeyboard(keyboard.MainKeyboard(api)).
+			AddKeyboard(keyboard.MainKeyboard(api, upd.Message.Recipient.ChatId)).
 			SetText("Привет! Я бот колледжа 😊\nВыберите действие:")
 
 		api.Messages.Send(ctx, msg)
